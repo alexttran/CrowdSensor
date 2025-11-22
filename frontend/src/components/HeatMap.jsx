@@ -12,14 +12,14 @@ const HeatMap = ({ devices, nodes }) => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
     // Create a custom CRS (Coordinate Reference System) for indoor mapping
-    const bounds = [[0, 0], [10, 12]];
+    const bounds = [[0, 0], [100, 120]];
 
     // Initialize map
     const map = L.map(mapRef.current, {
       crs: L.CRS.Simple,
-      minZoom: -1,
-      maxZoom: 2,
-      zoomControl: false,
+      minZoom: -2,
+      maxZoom: 10,
+      zoomControl: true,
       attributionControl: false
     });
 
@@ -84,7 +84,7 @@ const HeatMap = ({ devices, nodes }) => {
     heatLayerRef.current = L.heatLayer(heatData, {
       radius: 35,
       blur: 45,
-      maxZoom: 2,
+      maxZoom: 10,
       max: 1.0,
       gradient: {
         0.0: '#0a0a2e',
