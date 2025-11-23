@@ -23,7 +23,7 @@
 .connection-indicator {
   position: absolute;
   top: 40px;
-  left: 40px;
+  right: 40px;
   display: flex;
   align-items: center;
   gap: 10px;

@@ -12,6 +12,7 @@ const HeatMap = ({ devices, nodes }) => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
     // Create a custom CRS (Coordinate Reference System) for indoor mapping
+    // Adjust these bounds to match your image dimensions and coordinate system
     const bounds = [[0, 0], [100, 120]];
 
     // Initialize map
@@ -26,9 +27,14 @@ const HeatMap = ({ devices, nodes }) => {
     // Set view to center of the area
     map.fitBounds(bounds);
 
-    // Add a dark custom tile layer (grid background)
-    const gridLayer = L.layerGroup();
-    map.addLayer(gridLayer);
+    // Add background image overlay
+    // Place your image in: /public/floor-plan.jpg
+    const imageUrl = '/floor-plan.jpg';
+    const imageOverlay = L.imageOverlay(imageUrl, bounds, {
+      opacity: 1.0,
+      interactive: false
+    });
+    imageOverlay.addTo(map);
 
     mapInstanceRef.current = map;
 
@@ -68,20 +74,12 @@ const HeatMap = ({ devices, nodes }) => {
   useEffect(() => {
     if (!mapInstanceRef.current) return;
 
-    console.log('🔥 Heatmap Effect Running');
-    console.log('📊 Devices count:', devices.length);
-    console.log('📍 Device positions:', devices.slice(0, 3).map(d => d.position));
-    console.log('🗺️ L.heatLayer available:', typeof L.heatLayer);
-
     // Remove old heat layer
     if (heatLayerRef.current) {
       mapInstanceRef.current.removeLayer(heatLayerRef.current);
     }
 
-    if (devices.length === 0) {
-      console.warn('⚠️ No devices to display on heatmap');
-      return;
-    }
+    if (devices.length === 0) return;
 
     // Create heat map data points [lat, lng, intensity]
     const heatData = devices.map(device => [
@@ -90,31 +88,27 @@ const HeatMap = ({ devices, nodes }) => {
       1.0 // max intensity
     ]);
 
-    console.log('🔥 Heat data sample:', heatData.slice(0, 3));
-
     // Check if L.heatLayer exists
     if (!L.heatLayer) {
-      console.error('❌ L.heatLayer is not available! leaflet.heat not loaded');
+      console.error('leaflet.heat not loaded - heatmap will not display');
       return;
     }
 
-    // Add heat layer with MAXIMUM visibility for debugging
+    // Add heat layer with precise, zoom-independent settings
     heatLayerRef.current = L.heatLayer(heatData, {
-      radius: 80,          // Much larger radius
-      blur: 40,            // Less blur for sharper visibility
-      maxZoom: 10,
+      radius: 25,          // Smaller radius for precise blobs
+      blur: 15,            // Minimal blur for sharp edges
       max: 1.0,            // Maximum intensity
-      minOpacity: 0.3,     // Minimum opacity so it's always visible
+      minOpacity: 0.4,     // Visible but not overwhelming
       gradient: {
-        0.0: '#0000ff',    // Bright blue (fully opaque for testing)
-        0.5: '#ff00ff',    // Bright magenta
-        1.0: '#ff0000'     // Bright red
+        0.0: 'rgba(10, 10, 46, 0)',      // Transparent dark blue
+        0.2: '#16213e',                   // Dark blue
+        0.3: '#0f3460',                   // Medium blue
+        0.5: '#533483',                   // Purple
+        0.7: '#e94560',                   // Pink/red
+        1.0: '#ff6b9d'                    // Bright pink
       }
-    });
-
-    console.log('✅ Heatmap layer created:', heatLayerRef.current);
-    heatLayerRef.current.addTo(mapInstanceRef.current);
-    console.log('✅ Heatmap layer added to map');
+    }).addTo(mapInstanceRef.current);
   }, [devices]);
 
   return (
