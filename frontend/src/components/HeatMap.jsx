@@ -78,7 +78,6 @@ const HeatMap = ({ devices, nodes, onNodePositionChanged }) => {
         className: 'node-marker',
         html: `
           <div class="node-marker-inner ${node.status}">
-            <div class="node-pulse"></div>
             <div class="node-label">${node.name}</div>
           </div>
         `,

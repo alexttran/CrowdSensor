@@ -2,25 +2,7 @@ import { useEffect, useState } from 'react';
 import './StatsPanel.css';
 
 const StatsPanel = ({ devices, nodes }) => {
-  const [uptime, setUptime] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setUptime(prev => prev + 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const formatUptime = (seconds) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  };
-
   const totalDevices = devices.length;
-  const avgRssi = nodes.reduce((sum, node) => sum + node.rssiAvg, 0) / nodes.length;
   const activeNodes = nodes.filter(n => n.status === 'online').length;
 
   return (
@@ -45,19 +27,6 @@ const StatsPanel = ({ devices, nodes }) => {
           <div className="stat-bar">
             <div className="stat-bar-fill" style={{ width: `${(activeNodes / nodes.length) * 100}%` }}></div>
           </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-label">AVG SIGNAL</div>
-          <div className="stat-value">{avgRssi.toFixed(0)} dBm</div>
-          <div className="stat-bar">
-            <div className="stat-bar-fill" style={{ width: `${Math.min(Math.abs(avgRssi), 100)}%` }}></div>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-label">SYSTEM UPTIME</div>
-          <div className="stat-value uptime">{formatUptime(uptime)}</div>
         </div>
       </div>
 
@@ -85,21 +54,6 @@ const StatsPanel = ({ devices, nodes }) => {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      <div className="system-info">
-        <div className="info-row">
-          <span className="info-label">MODE</span>
-          <span className="info-value">TRILATERATION</span>
-        </div>
-        <div className="info-row">
-          <span className="info-label">SCAN INTERVAL</span>
-          <span className="info-value">2.0s</span>
-        </div>
-        <div className="info-row">
-          <span className="info-label">DATA SOURCE</span>
-          <span className="info-value placeholder-badge">PLACEHOLDER</span>
         </div>
       </div>
     </div>
